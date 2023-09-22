@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -21,12 +23,13 @@ export default function Register() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify(formData),
       });
-      // const data = await res.json();
+      const data = await res.json();
       setIsLoading(false);
-      if (res.data.success === "false") {
+      if (data.success === false) {
         setIsError(true);
         return;
       }
+      navigate("/login");
     } catch (error) {
       setIsLoading(false);
       setIsError(true);
@@ -76,7 +79,9 @@ export default function Register() {
           Login
         </Link>
       </div>
-      <p className="text-red-500 mt-3">{isError && "Something went wrong!"}</p>
+      <p className="text-red-500 mt-3">
+        {isError ? "Something went wrong!" : ""}
+      </p>
     </div>
   );
 }
