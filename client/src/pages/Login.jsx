@@ -7,6 +7,7 @@ import {
   signInPending,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import Oauth from "../components/Oauth";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -68,6 +69,7 @@ export default function Login() {
           >
             {isLoading ? "Loading ..." : "Sign In"}
           </button>
+          <Oauth />
         </div>
         <div className="flex gap-2 items-center">
           <span>Dont have an account?</span>

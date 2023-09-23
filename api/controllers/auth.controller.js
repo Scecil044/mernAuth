@@ -36,3 +36,45 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
+
+export const googleAuth = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const expiryDate = new Date(Date.now() + 3600000);
+
+      user.password = undefined;
+      res
+        .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
+        .status(201)
+        .json({
+          user
+        });
+    } else {
+      const generatedPassword = Math.random()
+        .toString(36)
+        .slice(-8);
+      const hashedPassword = bcrypt.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        userName:
+          req.body.name
+            .split(" ")
+            .join("")
+            .toLowerCase() + Math.floor(Math.random() * 10000).toString(),
+        email: req.body.email,
+        password: hashedPassword
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const expiryDate = new Date(Date.now() + 3600000);
+      newUser.password = undefined;
+      res
+        .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
+        .status(200)
+        .json(newUser);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
