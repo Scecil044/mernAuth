@@ -26,7 +26,7 @@ export const login = async (req, res, next) => {
     if (!validPassword) return next(errorHandler(403, "Invalid credentials"));
     //set Expiry date
     const expiryDate = new Date(Date.now() + 3600000);
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_sECRET);
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     validUser.password = undefined;
     res
       .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
