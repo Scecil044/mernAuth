@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 dotenv.config();
 mongoose
@@ -18,6 +19,11 @@ mongoose
     console.log(error);
   });
 const app = express();
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "/client/dist")));
+app.get('*', (req,res)=>{
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'))
+})
 
 app.use(express.json());
 app.use(cookieParser());
