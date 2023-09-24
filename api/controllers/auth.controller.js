@@ -44,7 +44,6 @@ export const googleAuth = async (req, res, next) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const expiryDate = new Date(Date.now() + 3600000);
 
-      user.password = undefined;
       res
         .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
         .status(201)
@@ -77,5 +76,16 @@ export const googleAuth = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res
+      .clearCookie("access_token")
+      .status(200)
+      .json("sign out successful");
+  } catch (error) {
+    console.log(error);
   }
 };

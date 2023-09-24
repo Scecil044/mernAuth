@@ -1,7 +1,9 @@
-export default function Home() {
+
+
+export default function About() {
   return (
     <div className="max-w-2xl mx-auto p-5">
-      <h4 className="font-semibold text-lg">MERN Authentication</h4>
+      <h4 className="font-semibold text-lg">About this app</h4>
       <p>
         This app has been meticulously crafted using a robust technology stack
         that combines the power of React, Node.js, and Firebase. React, renowned

@@ -6,6 +6,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 mongoose
@@ -19,12 +20,16 @@ mongoose
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 const port = process.env.PORT || 3000;
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
+app.get("/", (req, res) => {
+  res.json("welcome back");
+});
 app.use((err, req, res, next) => {
   const statusCode = err.status || 500;
   const message = err.message || "server error";

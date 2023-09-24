@@ -10,24 +10,23 @@ export default function Header() {
           <Link to="/">Auth App</Link>
         </h3>
         <ul className="flex item  gap-5">
-          <li>
-            <Link to="/login">Sign In</Link>
-          </li>
-          <li>
-            <Link to="/profile">
-              {userInfo ? (
-                <img
-                  src={userInfo.profilePicture}
-                  alt="profile pic"
-                  className="w-7 h-7 rounded-full object-cover"
-                />
-              ) : (
-                <li>
-                  <Link to="/register">Sign Up</Link>
-                </li>
-              )}
-            </Link>
-          </li>
+          <Link to="/">
+            <li>Home</li>
+          </Link>
+          <Link to="/about">
+            <li>About</li>
+          </Link>
+          <Link to="/profile">
+            {userInfo ? (
+              <img
+                src={userInfo.profilePicture}
+                alt="profile pic"
+                className="w-7 h-7 rounded-full object-cover"
+              />
+            ) : (
+              <li>Sign in</li>
+            )}
+          </Link>
         </ul>
       </div>
     </header>

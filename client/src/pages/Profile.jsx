@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -7,6 +6,16 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import {
+  updateFulfilled,
+  updateRejected,
+  updatePending,
+  deleteAccountFulfilled,
+  deleteAccountRejected,
+  deleteAccountPending,
+  signOut,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -15,16 +24,34 @@ export default function Profile() {
   const [image, setImage] = useState(undefined);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [uploadError, setUploadError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   // console.log(uploadPercentage);
   // console.log(formData);
+  const dispatch = useDispatch();
+  const { isLoading, isError } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    console.log(formData);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      dispatch(updatePending);
+      const res = await fetch(`/api/users/update/${userInfo._id}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.status === false) {
+        dispatch(updateRejected(data.message));
+      }
+      dispatch(updateFulfilled(data));
+      setIsSuccess(true);
+    } catch (error) {
+      dispatch(updateRejected(error));
+    }
   };
 
   const handleImageUpload = (image) => {
@@ -48,6 +75,33 @@ export default function Profile() {
         );
       }
     );
+  };
+
+  const deleteAccount = async () => {
+    try {
+      dispatch(deleteAccountPending);
+      const res = await fetch(`/api/users/delete/${userInfo._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteAccountRejected(data.message));
+        return;
+      }
+      dispatch(deleteAccountFulfilled(data));
+    } catch (error) {
+      dispatch(deleteAccountRejected(error));
+      console.log(error);
+    }
+  };
+
+  const handleLogOut = async () => {
+    try {
+      await fetch("/api/auth/logout");
+      dispatch(signOut());
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -91,7 +145,7 @@ export default function Profile() {
         <input
           type="text"
           placeholder="User Name"
-          id="email"
+          id="userName"
           defaultValue={userInfo.userName}
           className="bg-slate-100 rounded-md p-3"
           onChange={handleChange}
@@ -112,12 +166,25 @@ export default function Profile() {
           onChange={handleChange}
         />
         <button className="bg-slate-700 text-center text-white py-2 px-4 uppercase disabled:opacity-95 rounded-lg">
-          Update
+          {isLoading ? "Loading..." : "Update"}
         </button>
       </form>
       <div className="flex justify-between items-center mt-1">
-        <span className="text-red-600 cursor-pointer">Delete Account</span>
-        <span className="text-red-600 cursor-pointer">Sign Out</span>
+        <span className="text-red-600 cursor-pointer" onClick={deleteAccount}>
+          Delete Account
+        </span>
+        <span className="text-red-600 cursor-pointer" onClick={handleLogOut}>
+          Sign Out
+        </span>
+      </div>
+      <div>
+        {isSuccess ? (
+          <span className="text-green-700 text-sm">
+            Profile updated successfully
+          </span>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
